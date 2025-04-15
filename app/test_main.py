@@ -1,8 +1,9 @@
-from freezegun import freeze_time
 import pytest
-import datetime
+
 from app.main import outdated_products
+from unittest import mock
 from typing import Any
+import datetime
 
 
 @pytest.fixture()
@@ -21,12 +22,16 @@ def products_list() -> list:
     ]
 
 
-@freeze_time("2020-12-12")
-def test_today_date_not_outdated(products_list: Any) -> None:
+@mock.patch("app.main.datetime")
+def test_today_date_not_outdated(mock_datetime: mock,
+                                 products_list: Any) -> None:
+    mock_datetime.date.today.return_value = datetime.date(2020, 12, 12)
     assert outdated_products(products_list) == ["sausages"]
 
 
-@freeze_time("2025-05-25")
-def test_yesterday_is_outdated(products_list: Any) -> None:
+@mock.patch("app.main.datetime")
+def test_yesterday_is_outdated(mock_datetime: mock,
+                               products_list: Any) -> None:
+    mock_datetime.date.today.return_value = datetime.date(2025, 5, 25)
     products_list[0]["expiration_date"] = datetime.date(2025, 5, 24)
     assert outdated_products(products_list) == ["milk", "sausages"]
