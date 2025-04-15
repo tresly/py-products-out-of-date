@@ -2,6 +2,7 @@ from freezegun import freeze_time
 import pytest
 import datetime
 from app.main import outdated_products
+from typing import Any
 
 
 @pytest.fixture()
@@ -21,11 +22,11 @@ def products_list() -> list:
 
 
 @freeze_time("2020-12-12")
-def test_today_date_not_outdated(products_list):
+def test_today_date_not_outdated(products_list: Any) -> None:
     assert outdated_products(products_list) == ["sausages"]
 
 
 @freeze_time("2025-05-25")
-def test_yesterday_is_outdated(products_list):
+def test_yesterday_is_outdated(products_list: Any) -> None:
     products_list[0]["expiration_date"] = datetime.date(2025, 5, 24)
     assert outdated_products(products_list) == ["milk", "sausages"]
